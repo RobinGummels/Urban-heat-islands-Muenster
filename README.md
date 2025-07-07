@@ -10,31 +10,38 @@ Untersuchung und Visualisierung urbaner Hitzeinseln in Münster durch Vergleich 
 
 ## Datengrundlage
 
-**Satellitendaten:** Landsat 8 / 9 (OLI + TIRS)
+**Satellitendaten:** Landsat 8 / 9 (TIRS)
 
 **Zeitraum:**
-- Frühling: 5–8 cloudfreie Szenen aus März–Mai (letzte 5 Jahre)
-- Sommer: 5–8 cloudfreie Szenen aus Juni–August (letzte 5 Jahre)
+- Frühling: 8 cloudfreie Szenen aus März–Mai (letzte 4 Jahre)
+- Sommer: 8 cloudfreie Szenen aus Juni–August (letzte 4 Jahre)
 
 **Benötigte Kanäle:**
-- TIRS: Band 10 (ggf. Band 11 für Emissivität)
-- OLI: Band 4 (Rot), Band 5 (NIR)
+- TIRS: Band 10 für Oberflächentemperatur (LST)
 
+
+**Satellitendaten:** Sentinel-2
+
+**Zeitraum:**
+- 1 cloudfreie Szenen aus den letzten Jahren
+
+**Benötigte Kanäle:**
+- RGB, NIR, SWIR
 ---
 
 ## Verarbeitungsschritte
 
 ### 1. Berechnung der Landoberflächentemperatur (LST)
 - Umrechnung von DN-Werten → Radianz → Temperatur mittels Planck-Gleichung
-- Optional: Emissivitätskorrektur (z. B. NDVI-basiert)
+  - Dazu werden zunächst alle Landsat Images unter ".\data\landsat-imagery\raw-data\landsat-`{Jahreszeit}`\" abgelegt
+  - Danach wird das Programm `clip_and_convert_to_LST.py` ausgeführt
+    - Dadurch wurden die Rohdaten auf die area-of-interest zugeschnitten und die Werte von DN zur Oberflächentemperetur überführt
+    - Die Ausgabe wird dabei unter ".\data\landsat-imagery\clipped-lst\landsat-`{Jahreszeit}`\" abgelegt
 
-### 2. Berechnung von NDVI und NDMI
-- NDVI = (NIR − Red) / (NIR + Red)
-- NDMI = (NIR − SWIR) / (NIR + SWIR) *(sofern SWIR vorhanden)*
+### 2. Bildung saisonaler Temperatur Mittelwerte
+- Um für jede Jahreszeit eine saisonale Mittelwertkarte zu erstellen wird danach das Programm `calc_mean_temp.py` ausgeführt
+  - Dadurch werden pro Jahreszeit eine Mittelwertkarte unter ".\data\landsat-imagery\raw-data\landsat-`{Jahreszeit}`\" erstellt
 
-### 3. Bildung saisonaler Mittelwerte
-- Sommer-Mittelwertkarte (aus 5–8 Sommer-Szenen)
-- Frühling-Mittelwertkarte (aus 5–8 Frühlings-Szenen)
 
 ---
 
@@ -79,11 +86,15 @@ Ziel: Erkennung der typischen thermischen Eigenschaften jeder Landbedeckung.
 
 ### C. Korrelationen mit Vegetation und Feuchte
 
+**Berechnung von NDVI und NDMI**
+- NDVI = (NIR − Red) / (NIR + Red)
+- NDMI = (NIR − SWIR) / (NIR + SWIR)
+
 **Visualisierung:** Scatterplots (inkl. Regressionslinie)
 
 **Beziehungen:**
 - NDVI vs. LST (Frühling und Sommer separat)
-- NDMI vs. LST (sofern NDMI verfügbar)
+- NDMI vs. LST
 
 Ziel: Quantitative Analyse der Kühlwirkung von Vegetation und Bodenfeuchte.
 

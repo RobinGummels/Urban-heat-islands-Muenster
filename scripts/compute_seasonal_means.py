@@ -7,6 +7,8 @@ def compute_seasonal_means():
     Calculates the pixel-wise mean of all clipped LST rasters (_ST_B10.TIF) per season
     and writes one GeoTIFF per season under ../data/landsat-imagery/seasonal-means.
     """
+    gdal.UseExceptions()
+    
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'clipped-lst')
     output_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'seasonal-means')
@@ -53,7 +55,7 @@ def compute_seasonal_means():
         mean_arr[valid] = (sum_arr[valid] / count_arr[valid]).astype(np.float32)
 
         # Write output GeoTIFF
-        out_path = os.path.join(output_dir, f"{season}_mean_ST_B10.tif")
+        out_path = os.path.join(output_dir, f"{season}_mean.tif")
         driver = gdal.GetDriverByName('GTiff')
         out_ds = driver.Create(out_path, xsize, ysize, 1, gdal.GDT_Float32)
         out_ds.SetGeoTransform(geotrans)

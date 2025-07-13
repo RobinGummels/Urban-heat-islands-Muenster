@@ -9,6 +9,8 @@ def clip_and_convert_to_lst():
     using the specified shapefile, converts DN to °C using the
     LEVEL2_SURFACE_TEMPERATURE_PARAMETERS, and saves as Float32 with NoData=-9999.
     """
+    gdal.UseExceptions()
+    
     # Determine paths relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'raw-data')

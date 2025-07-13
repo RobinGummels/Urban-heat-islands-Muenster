@@ -1,122 +1,88 @@
-# Projektkonzept: Urbane Hitzeinseln in Münster
+# Saisonale Hitzeinseln im Münsterland
 
-## Zielsetzung
-Untersuchung und Visualisierung urbaner Hitzeinseln in Münster durch Vergleich von Frühjahrs- und Sommerdaten der letzten fünf Jahre. Der Fokus liegt auf:
-- Temperaturverteilung nach Flächennutzung
-- Einfluss von Vegetation und Bodenfeuchte
-- Darstellung relativer sowie absoluter Unterschiede
+Dieses Repository enthält den vollständigen Workflow sowie alle relevanten Daten und Skripte zur Analyse saisonaler Hitzeinseln im Münsterland. Ziel ist die quantitative Beschreibung der saisonalen Dynamik zwischen Frühling und Sommer, die räumliche Analyse der Landoberflächentemperaturen (LST) in Bezug auf verschiedene Landnutzungstypen und die Bewertung des Einflusses vegetativer und feuchtebezogener Indizes (NDVI, NDMI) auf die Temperaturmuster.
 
----
+## Übersicht
 
-## Datengrundlage
+Die urbane Hitzeinselwirkung ist längst nicht mehr nur ein metropolitanes Phänomen. Versiegelte Flächen speichern tagsüber Wärme und geben diese nachts nur langsam ab, während Vegetationsflächen durch Evapotranspiration eine natürliche Kühlfunktion übernehmen. Diese Studie analysiert die saisonalen Unterschiede in der Hitzeinselbildung im Raum Münster mithilfe satellitengestützter Daten.
 
-**Satellitendaten:** Landsat 8 / 9 (TIRS)
+## Daten und Methoden
 
-**Zeitraum:**
-- Frühling: 8 cloudfreie Szenen aus März–Mai (letzte 4 Jahre)
-- Sommer: 8 cloudfreie Szenen aus Juni–August (letzte 4 Jahre)
+### Rohdaten
 
-**Benötigte Kanäle:**
-- TIRS: Band 10 für Oberflächentemperatur (LST)
+Grundlage der Analyse sind Landsat 8/9 Satellitendaten (Rohdaten konnte aufgrund der Größe nicht ins Repository gepusht werden), aufgenommen zwischen 2022 und 2025, welche saisonal (Frühling: März-Mai; Sommer: Juni-August) zusammengefasst wurden. Die atmosphärenkorrigierten Level-2 Daten stammen aus dem USGS Land Surface Analysis Archive (Collection 2, Level-2 SP).
 
+Die LST-Werte wurden aus Band 10 abgeleitet:
 
-**Satellitendaten:** Sentinel-2
+```
+LST(°C) = DN × M + A − 273,15
+```
 
-**Zeitraum:**
-- 1 cloudfreie Szenen aus den letzten Jahren
+### Vorverarbeitung
 
-**Benötigte Kanäle:**
-- RGB, NIR, SWIR
----
+Zur Vergleichbarkeit der saisonalen Temperaturunterschiede wurden die Raster einer z-Normalisierung unterzogen:
 
-## Verarbeitungsschritte
+```
+z = (x - μ) / σ
+```
 
-### 1. Berechnung der Landoberflächentemperatur (LST)
-- Umrechnung von DN-Werten → Radianz → Temperatur mittels Planck-Gleichung
-  - Dazu werden zunächst alle Landsat Images unter ".\data\landsat-imagery\raw-data\landsat-`{Jahreszeit}`\" abgelegt
-  - Danach wird das Programm `clip_and_convert_to_LST.py` ausgeführt
-    - Dadurch wurden die Rohdaten auf die area-of-interest zugeschnitten und die Werte von DN zur Oberflächentemperetur überführt
-    - Die Ausgabe wird dabei unter ".\data\landsat-imagery\clipped-lst\landsat-`{Jahreszeit}`\" abgelegt
+Dabei repräsentiert x die Pixeltemperatur, μ den saisonalen Mittelwert und σ die Standardabweichung.
 
-### 2. Bildung saisonaler Temperatur Mittelwerte
-- Um für jede Jahreszeit eine saisonale Mittelwertkarte zu erstellen wird danach das Programm `calc_mean_temp.py` ausgeführt
-  - Dadurch werden pro Jahreszeit eine Mittelwertkarte unter ".\data\landsat-imagery\raw-data\landsat-`{Jahreszeit}`\" erstellt
+Die resultierende Δz-Karte (Differenz Sommer-Frühling) zeigt die Veränderung der Hitzeinselwirkung zwischen den Jahreszeiten.
 
+### Landnutzung und Indizes
 
----
+Die Klassifikation der Landnutzung erfolgte auf Basis einer Sentinel-2-Szene mithilfe eines Random-Forest-Algorithmus in die Klassen Infrastruktur, Wasser, Wald sowie Feld/Wiese.
 
-## Normalisierung
+Zusätzlich wurden der NDVI und NDMI berechnet, um den Einfluss von Vegetation und Bodenfeuchte auf die Temperatur zu analysieren.
 
-Ziel: Vergleichbarkeit der Temperaturverteilungen zwischen den Jahreszeiten
+## Ergebnisse
 
-**Methode:** Z-Transformation (oder alternativ Min-Max-Normalisierung)
+Wenn du an dem Gesamtergebnis und an der Interpretation der Ergebnisse unserer Arbeit interessiert bist schaue dir gerne unser Poster `Saisonale_Hitzeinseln_im_Münsterland.pdf` an. Dieses Repository und das Poster wurde im Zusammenhang mit der Prüfungsleistung des Moduls "Einführung in die Fernerkundung" im Sommersemester 2025 an der Universität Münster erstellt.
 
-Formel:
-$T_{norm} = (T - \mu_{Saison}) / \sigma_{Saison}$
+## Workflow
 
+Um die Analyse vollständig durchzuführen, gehe wie folgt vor:
 
-Ergebnis: Darstellung relativer Hitze innerhalb der jeweiligen Szene → Frühling und Sommer werden vergleichbar.
+1. Speichere Landsat-Rohdaten im Ordner `data/landsat-imagery/raw-data` in passenden Unterordnern (z.B. nach Jahreszeiten).
+2. Erstelle und speichere die Projekt-Area-of-Interest als Shapefile in `data/project-area`.
+3. Speichere deine Landnutzungsklassifikation in `data/sentinel-2/classification`.
+4. Berechne und speichere NDVI- und NDMI-Raster in `data/sentinel-2/ndvi-ndmi`.
 
----
+Starte anschließend das Hauptskript:
 
-## Analyse und Visualisierung
+```bash
+python scripts/run_full_analysis.py
+```
 
-### A. Klassifizierung von Flächentypen
+Dieses Skript führt automatisch alle einzelnen Prozessschritte (Vorverarbeitung, LST-Berechnung, Normalisierung, Differenz-Berechnung, Korrelation und klassenspezifische-Analyse) aus.
 
-**Zielklassen:**
-- Infrastruktur (versiegelt)
-- Wald
-- Gewässer
-- Wiese/Feld
+### Repository-Struktur
 
-**Methodik:** Schwellenwertbasierte oder überwachte Klassifikation
+```
+├── data
+│   ├── landsat-imagery
+│   │   └── raw-data (Hier Landsat-Szenen in Unterordnern nach Jahreszeiten o. Ä. speichern)
+│   ├── project-area (Hier Shapefile der Area-of-Interest ergänzen)
+│   ├── sentinel-2
+│       ├── classification (Landnutzungsklassifikation)
+│       └── ndvi-ndmi (Raster der NDVI- und NDMI-Indizes)
+├── scripts
+│   ├── boxplot_by_class.py
+│   ├── clip_and_convert_to_LST.py
+│   ├── compute_seasonal_means.py
+│   ├── compute_lst_with_indices.py
+│   └── deltaZ-statistics.py
+│   └── normalize_seasonal_means_z-trans.py
+│   └── z_transformed_boxplot_by_class-trans.py
+```
 
----
+## Nutzung und Erweiterung
 
-### B. Temperaturvergleich pro Klasse
+Der Workflow ist offen gestaltet, sodass mit geringfügigen Anpassungen andere Zeiträume oder Untersuchungsgebiete analysiert werden können. Alle notwendigen Anpassungen erfolgen durch Aktualisierung der Datensätze in den genannten Ordnern. Der klare Aufbau der Python-Skripte unterstützt hierbei eine einfache Anpassung und Erweiterung der Analysen.
 
-**Darstellung:**
-- Boxplots (Whiskerplots) je Klasse:
-  - Relative Temperatur im Frühling
-  - Relative Temperatur im Sommer
+## Referenz
 
-Ziel: Erkennung der typischen thermischen Eigenschaften jeder Landbedeckung.
+Gummels, R., & Kruck, L. (2025). Urban-heat-islands-Muenster \[Source code]. GitHub. [https://github.com/RobinGummels/Urban-heat-islands-Muenster](https://github.com/RobinGummels/Urban-heat-islands-Muenster)
 
----
-
-### C. Korrelationen mit Vegetation und Feuchte
-
-**Berechnung von NDVI und NDMI**
-- NDVI = (NIR − Red) / (NIR + Red)
-- NDMI = (NIR − SWIR) / (NIR + SWIR)
-
-**Visualisierung:** Scatterplots (inkl. Regressionslinie)
-
-**Beziehungen:**
-- NDVI vs. LST (Frühling und Sommer separat)
-- NDMI vs. LST
-
-Ziel: Quantitative Analyse der Kühlwirkung von Vegetation und Bodenfeuchte.
-
----
-
-### D. Differenzbild (Sommer − Frühling)
-
-**Berechnung:**
-$\Delta T = T_{Sommer} − T_{Frühling}$
-
-
-**Ziel:** Darstellung des tatsächlichen Temperaturanstiegs im Stadtgebiet
-
-**Darstellung:** Karte mit abgestufter Farblegende
-
----
-
-## Zusammenfassende Darstellung (Posteraufbau-Vorschlag)
-
-1. Übersichtskarte Münster mit Klassifikation der Flächentypen
-2. Temperaturkarten (Frühling und Sommer, normalisiert)
-3. Differenzkarte ΔT
-4. Whiskerplots pro Klasse (Frühling/Sommer)
-5. Scatterplots zu NDVI/LST und NDMI/LST
-6. Fazit und Handlungsempfehlungen (z. B. gezielte Begrünung, Entsiegelung)
+Für Rückfragen stehen wir gerne zur Verfügung. Viel Erfolg bei deiner Analyse!

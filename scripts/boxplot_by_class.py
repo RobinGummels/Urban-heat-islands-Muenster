@@ -15,18 +15,21 @@ mpl.rcParams.update({
     'figure.titlesize': 20
 })
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def boxplot_lst_by_class():
     """
     Loads seasonal mean LST rasters (Spring, Summer) and a classification raster,
     resamples LST rasters to classification grid (10m resolution), then for each
     land-use class (1-4) plots side-by-side boxplots of LST values in Spring vs Summer.
-    Saves figure to ../data/plots/lst_boxplots_by_class.png
+    Saves figure to ../images/lst_boxplots_by_class.png
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Paths
-    class_path = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'results', 'Klassifikation_rf.tif')
+    class_path = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'classification', 'classification.tif')
     seasonal_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'seasonal-means')
-    plots_dir = os.path.join(script_dir, '..', 'data', 'plots')
+    plots_dir = os.path.join(script_dir, '..', 'images')
     os.makedirs(plots_dir, exist_ok=True)
 
     # Seasonal files

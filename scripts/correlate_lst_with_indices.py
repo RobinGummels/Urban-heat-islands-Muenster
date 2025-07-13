@@ -15,19 +15,22 @@ mpl.rcParams.update({
     'figure.titlesize':  20,    # Figure‐Titel (falls verwendet)
 })
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def correlate_lst_with_indices():
     """
     Computes R² and scatter plots with colored regression lines for:
     - NDVI vs LST per season
     - NDMI vs LST per season
-    Outputs saved in ../data/plots
+    Outputs saved in ../images/
     """
     gdal.UseExceptions()
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     seasonal_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'seasonal-means')
-    indices_dir = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'results')
-    plots_dir = os.path.join(script_dir, '..', 'data', 'plots')
+    indices_dir = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'ndvi-ndmi')
+    plots_dir = os.path.join(script_dir, '..', 'images')
     os.makedirs(plots_dir, exist_ok=True)
 
     # find the single NDVI and NDMI files

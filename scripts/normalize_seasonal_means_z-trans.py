@@ -2,6 +2,9 @@ import os
 from osgeo import gdal
 import numpy as np
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def normalize_seasonal_means():
     """
     Normalizes the seasonal mean LST rasters using Z-transformation

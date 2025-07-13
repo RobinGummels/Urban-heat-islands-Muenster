@@ -15,6 +15,9 @@ mpl.rcParams.update({
     'figure.titlesize': 20
 })
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def z_transformed_boxplot_lst_by_class():
     """
     Loads seasonal z-transformed mean LST rasters (Spring, Summer) and a classification raster,
@@ -26,9 +29,9 @@ def z_transformed_boxplot_lst_by_class():
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Paths
-    class_path = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'results', 'Klassifikation_rf.tif')
+    class_path = os.path.join(script_dir, '..', 'data', 'sentinel-2', 'classification', 'classification.tif')
     seasonal_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'seasonal-means-normalized-Z-transformed')
-    plots_dir = os.path.join(script_dir, '..', 'data', 'plots')
+    plots_dir = os.path.join(script_dir, '..', 'images')
     os.makedirs(plots_dir, exist_ok=True)
 
     # Seasonal files

@@ -10,7 +10,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # paths
 landcov_path = os.path.join(
-    script_dir, '..', 'data', 'sentinel-2', 'results', 'Klassifikation_rf.tif'
+    script_dir, '..', 'data', 'sentinel-2', 'classification', 'classification.tif'
 )
 deltaz_path = os.path.join(
     script_dir, '..', 'data', 'landsat-imagery', 'delta-z', 'delta_z.tif'

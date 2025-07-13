@@ -2,6 +2,9 @@ import os
 import numpy as np
 from osgeo import gdal
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def compute_seasonal_means():
     """
     Calculates the pixel-wise mean of all clipped LST rasters (_ST_B10.TIF) per season

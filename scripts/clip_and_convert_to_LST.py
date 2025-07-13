@@ -3,6 +3,9 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from osgeo import gdal
 
+# Enable GDAL exceptions (FutureWarning fix)
+gdal.UseExceptions()
+
 def clip_and_convert_to_lst():
     """
     Clips only the Landsat thermal band rasters (ending with _ST_B10.TIF)
@@ -14,7 +17,7 @@ def clip_and_convert_to_lst():
     # Determine paths relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'raw-data')
-    shapefile = os.path.join(script_dir, '..', 'data', 'project-area', 'Project-Area Münster.shp')
+    shapefile = os.path.join(script_dir, '..', 'data', 'project-area', 'project-are.shp')
     output_dir = os.path.join(script_dir, '..', 'data', 'landsat-imagery', 'clipped-lst')
 
     os.makedirs(output_dir, exist_ok=True)
